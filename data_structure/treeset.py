@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+
+
 import bisect
 
 
@@ -23,9 +26,17 @@ class TreeSet(object):
 
     def ceiling(self, e):
         index = bisect.bisect_right(self._treeset, e)
+
         if self[index - 1] == e:
             return e
         return self._treeset[bisect.bisect_right(self._treeset, e)]
+
+    def higher(self, e):
+        index = bisect.bisect_right(self._treeset, e)
+        if index == len(self._treeset):
+            return None
+        else:
+            return self._treeset[bisect.bisect_right(self._treeset, e)]
 
     def floor(self, e):
         index = bisect.bisect_left(self._treeset, e)

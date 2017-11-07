@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from double_array_trie.abstract_double_array_trie import AbstractDoubleArrayTrie
+from array_trie.abstract_double_array_trie import AbstractDoubleArrayTrie
 from data_structure.treeset import TreeSet
 
 
@@ -8,21 +8,22 @@ class DoubleArrayTrie(AbstractDoubleArrayTrie):
         super().__init__(alphabet_length)
         self.__base = []
         self.__check = []
-        self.__base.append(super()._INITIAL_ROOT_BASE)
-        self.__check.append(super()._ROOT_CHECK_VALUE)
-        self.__free_positions = TreeSet
+        self.__base.append(self._INITIAL_ROOT_BASE)
+        self.__check.append(self._ROOT_CHECK_VALUE)
+        self.__free_positions = TreeSet()
 
     def _ensure_reachable_index(self, index):
-        while super()._get_size() < index:
-            self.__base.append(super()._EMPTY_VALUE)
-            self.__check.append(super()._EMPTY_VALUE)
+        while self._get_size() <= index:
+            self.__base.append(self._EMPTY_VALUE)
+            self.__check.append(self._EMPTY_VALUE)
             self.__free_positions.add(len(self.__base)-1)
 
     def _next_available_hop(self, for_value):
-        while self.__free_positions.ceiling(for_value) >= for_value:
+
+        while self.__free_positions.higher(for_value) is None:
             self._ensure_reachable_index(len(self.__base) + 1)
 
-        result = self.__free_positions.ceiling(for_value) - for_value
+        result = self.__free_positions.higher(for_value) - for_value
 
         return result
 
@@ -44,7 +45,7 @@ class DoubleArrayTrie(AbstractDoubleArrayTrie):
     def __find_consecutive_free(self, amount):
         if self.__free_positions.__len__() == 0:
             return -1
-        it = self.__free_positions.__iter__()
+        it = self.__free_positions
         from_value = it[0]
         previous = from_value
 
@@ -72,14 +73,14 @@ class DoubleArrayTrie(AbstractDoubleArrayTrie):
 
     def _set_base(self, position, value):
         self.__base[position] = value
-        if value == super()._EMPTY_VALUE:
+        if value == self._EMPTY_VALUE:
             self.__free_positions.add(position)
         else:
             self.__free_positions.remove(position)
 
     def _set_check(self, position, value):
         self.__check[position] = value
-        if value == super()._EMPTY_VALUE:
+        if value == self._EMPTY_VALUE:
             self.__free_positions.add(position)
         else:
             self.__free_positions.remove(position)
@@ -98,8 +99,3 @@ class DoubleArrayTrie(AbstractDoubleArrayTrie):
 
     def _update_state_move(self, state_index, new_base):
         pass
-
-
-
-
-

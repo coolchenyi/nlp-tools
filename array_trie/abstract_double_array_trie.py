@@ -2,7 +2,7 @@
 
 from abc import ABCMeta, abstractmethod
 from data_structure.treeset import TreeSet
-from enum import Enum
+from enum import Enum, unique
 
 
 class AbstractDoubleArrayTrie(metaclass=ABCMeta):
@@ -22,8 +22,8 @@ class AbstractDoubleArrayTrie(metaclass=ABCMeta):
         changed = False
         state = 0
         len_list = len(values)
-
-        for i in range(len_list):
+        i = 0
+        while i < len_list:
             c = values[i]
             transition = self._get_base(state) + c
             self._ensure_reachable_index(transition)
@@ -42,6 +42,7 @@ class AbstractDoubleArrayTrie(metaclass=ABCMeta):
 
             self._update_insert(state, i - 1, list)
             state = transition
+            i = i + 1
 
         return changed
 
@@ -56,8 +57,15 @@ class AbstractDoubleArrayTrie(metaclass=ABCMeta):
         values.remove(new_value)
         for c in values:
             temp_next = self._get_base(s) + c
+            assert temp_next < self._get_size()
+            assert self._get_check(temp_next) == s
+
+            assert self._get_check(new_location + c) == self._EMPTY_VALUE
             self._set_check(new_location + c, s)
+
+            assert self._get_base(new_location + c) == self._EMPTY_VALUE
             self._set_base(new_location + c, self._get_base(self._get_base(s) + c))
+
             self._update_child_move(s, c, new_location)
             if self._get_base(self._get_base(s) + c) != self._LEAF_BASE_VALUE:
                 for d in range(self.__alphabet_length):
@@ -66,14 +74,14 @@ class AbstractDoubleArrayTrie(metaclass=ABCMeta):
                         self._set_check(self._get_base(self._get_base(s) + c) + d, new_location + c)
                     elif temp_next_child >= self._get_size():
                         break
-                self._get_base(self._get_base(s) + c, self._EMPTY_VALUE)
-                self._set_check(self._get_base(s) + c, self.EMPTY_VALUE)
+                self._set_base(self._get_base(s) + c, self._EMPTY_VALUE)
+                self._set_check(self._get_base(s) + c, self._EMPTY_VALUE)
 
         self._set_base(s, new_location)
         self._update_state_move(s, new_location)
 
     def contains_prefix(self, prefix):
-        return self._run_prefix(prefix)
+        return self._run_prefix(prefix).result
 
     def _run_prefix(self, prefix):
         state = 0
@@ -158,13 +166,7 @@ class AbstractDoubleArrayTrie(metaclass=ABCMeta):
         pass
 
 
-class SearchState(object):
-    prefix = []
-    index = 0
-    finishedAtState = None
-    result = SearchResult.PERFECT_MATCH
-
-
+@unique
 class SearchResult(Enum):
     PERFECT_MATCH = 1
     PURE_PREFIX = 2
@@ -172,8 +174,11 @@ class SearchResult(Enum):
     NOT_FOUND = 4
 
 
-
-
+class SearchState(object):
+    prefix = []
+    index = 0
+    finishedAtState = None
+    result = SearchResult.PERFECT_MATCH
 
 
 
