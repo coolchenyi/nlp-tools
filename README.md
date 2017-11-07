@@ -2,7 +2,7 @@
 
 ## 1 data structure
 
-- TreeSet like java TreeSet implement
+- A TreeSet implement like java TreeSet
 
 ## 2 trie
 
